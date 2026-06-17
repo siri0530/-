@@ -14,7 +14,14 @@
                 <p class="mission-text">우주 정거장으로 쏟아지는 원소 운석을 방어하라!<br><strong>[원소 이름]을 보고 올바른 [원소 기호]를 대소문자에 맞춰 입력하시오!</strong></p>
                 <div id="name-input-area">
                     <input type="text" id="player-name" placeholder="닉네임 또는 학번 이름을 입력하세요" maxlength="10">
-                    <button id="start-btn">게임 시작</button>
+                    
+                    <div style="margin: 15px 0; display: flex; justify-content: center; gap: 15px; align-items: center;">
+                        <span style="font-size: 15px; color: #b0b3cc; font-weight: bold;">난이도 선택:</span>
+                        <button id="level-low-btn" type="button" style="background: #00f2fe; color: #060713; border: none; padding: 8px 18px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; border: 2px solid #00f2fe;">하 (기본)</button>
+                        <button id="level-high-btn" type="button" style="background: transparent; color: #ff4b72; border: 2px solid #ff4b72; padding: 8px 18px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer;">상 (지옥)</button>
+                    </div>
+
+                    <button id="start-btn" style="margin-top: 10px;">게임 시작</button>
                 </div>
             </div>
         </div>
