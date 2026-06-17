@@ -11,7 +11,7 @@ const elementDatabase = [
 let score = 0;
 let lives = 3;
 let isGameOver = false;
-let isGameStarted = false; // 시작 제어 플래그
+let isGameStarted = false; 
 let playerName = "무명전사";
 let spawnInterval, loopInterval;
 
@@ -26,21 +26,18 @@ const rankingList = document.getElementById('ranking-list');
 
 let activeInvaders = [];
 
-// [스타트 버튼이 눌렸을 때 시스템 작동]
 document.getElementById('start-btn').addEventListener('click', function() {
     const inputName = document.getElementById('player-name').value.trim();
     if(inputName !== "") {
         playerName = inputName;
     }
     
-    // 안내창 닫고 입력창 활성화 후 게임 스타트
     startScreen.classList.add('hidden');
     userInput.disabled = false;
     userInput.focus();
     isGameStarted = true;
     
-    // 타이머 작동 시작
-    spawnInterval = setInterval(createInvader, 1500);
+    spawnInterval = setInterval(createInvader, 1800); // 생성 주기도 1.8초로 쾌적하게 조절
     loopInterval = setInterval(gameLoop, 25);
 });
 
@@ -70,10 +67,11 @@ function gameLoop() {
     
     for (let i = activeInvaders.length - 1; i >= 0; i--) {
         let invader = activeInvaders[i];
-        invader.top += 2.0; 
+        invader.top += 1.1; // ★ 속도를 2.0 -> 1.1로 훨씬 여유롭게 패치
         invader.element.style.top = invader.top + 'px';
         
-        if (invader.top + 65 > 430) {
+        // ★ 충돌 경계선 수정: 화면 맨 아래 바닥선(480px)에 완전히 닿았을 때 감지
+        if (invader.top + 65 > 480) {
             invader.element.remove();
             activeInvaders.splice(i, 1);
             decreaseLife();
@@ -92,7 +90,6 @@ function decreaseLife() {
     }
 }
 
-// [게임 종료 및 학교 랭킹 연산 산출 데이터 로직]
 function endGame() {
     isGameOver = true;
     clearInterval(spawnInterval);
@@ -103,20 +100,15 @@ function endGame() {
     
     finalScoreDisplay.innerText = "최종 점수: " + score + "점";
     
-    // 로컬 시스템에 스코어 기록 저장 및 불러오기 연산
     let localRankings = JSON.parse(localStorage.getItem('schoolRankings')) || [];
     localRankings.push({ name: playerName, score: score });
-    // 점수 높은 순으로 내림차순 정렬
     localRankings.sort((a, b) => b.score - a.score);
-    // 상위 5명만 보관
     localRankings = localRankings.slice(0, 5);
     localStorage.setItem('schoolRankings', JSON.stringify(localRankings));
     
-    // 화면에 등수 순위판 렌더링 동적 구현
     rankingList.innerHTML = "";
     localRankings.forEach((player, index) => {
         const li = document.createElement('li');
-        // 내가 달성한 점수 기록 행은 특별히 네온 하이라이트 효과 적용
         if(player.name === playerName && player.score === score) {
             li.innerHTML = `<strong>${index + 1}등. ${player.name} - ${player.score}점 ★내기록</strong>`;
             li.style.color = "#00f2fe";
