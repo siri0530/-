@@ -1,43 +1,36 @@
-// 원자 번호 1번부터 20번까지의 원소 데이터셋 (순서대로 정렬)
 const elementDatabase = [
-    { name: "수소", code: "H" },     // 1번
-    { name: "헬륨", code: "He" },    // 2번
-    { name: "리튬", code: "Li" },    // 3번
-    { name: "베릴륨", code: "Be" },  // 4번
-    { name: "붕소", code: "B" },     // 5번
-    { name: "탄소", code: "C" },     // 6번
-    { name: "질소", code: "N" },     // 7번
-    { name: "산소", code: "O" },     // 8번
-    { name: "플루오린", code: "F" },  // 9번
-    { name: "네온", code: "Ne" },    // 10번
-    { name: "나트륨", code: "Na" },  // 11번
-    { name: "마그네슘", code: "Mg" },// 12번
-    { name: "알루미늄", code: "Al" },// 13번
-    { name: "규소", code: "Si" },    // 14번
-    { name: "인", code: "P" },       // 15번
-    { name: "황", code: "S" },       // 16번
-    { name: "염소", code: "Cl" },    // 17번
-    { name: "아르곤", code: "Ar" },  // 18번
-    { name: "칼륨", code: "K" },     // 19번
-    { name: "칼슘", code: "Ca" }     // 20번
+    { name: "수소", code: "H" }, { name: "헬륨", code: "He" }, { name: "리튬", code: "Li" },
+    { name: "베릴륨", code: "Be" }, { name: "붕소", code: "B" }, { name: "탄소", code: "C" },
+    { name: "질소", code: "N" }, { name: "산소", code: "O" }, { name: "플루오린", code: "F" },
+    { name: "네온", code: "Ne" }, { name: "나트륨", code: "Na" }, { name: "마그네슘", code: "Mg" },
+    { name: "알루미늄", code: "Al" }, { name: "규소", code: "Si" }, { name: "인", code: "P" },
+    { name: "황", code: "S" }, { name: "염소", code: "Cl" }, { name: "아르곤", code: "Ar" },
+    { name: "칼륨", code: "K" }, { name: "칼슘", code: "Ca" }
 ];
 
 let score = 0;
+let lives = 3;
+let isGameOver = false;
+let spawnInterval, loopInterval;
+
 const gameArea = document.getElementById('game-area');
 const userInput = document.getElementById('user-input');
 const scoreDisplay = document.getElementById('score');
+const hearts = document.querySelectorAll('.heart');
+const gameOverScreen = document.getElementById('game-over-screen');
+const finalScoreDisplay = document.getElementById('final-score');
+
 let activeInvaders = [];
 
-// 원소 운석 생성
 function createInvader() {
+    if (isGameOver) return;
     const randomElement = elementDatabase[Math.floor(Math.random() * elementDatabase.length)];
     
     const invaderElement = document.createElement('div');
     invaderElement.classList.add('invader');
     invaderElement.innerText = randomElement.name; 
     
-    // 좌우 위치 무작위 지정 (가장자리 탈출 방지)
-    const randomX = Math.floor(Math.random() * 320);
+    const randomX = Math.floor(Math.random() * 300);
     invaderElement.style.left = randomX + 'px';
     invaderElement.style.top = '0px';
     
@@ -50,49 +43,76 @@ function createInvader() {
     });
 }
 
-// 운석 하강 시스템
 function gameLoop() {
+    if (isGameOver) return;
+    
     for (let i = activeInvaders.length - 1; i >= 0; i--) {
         let invader = activeInvaders[i];
-        invader.top += 1.5; // 떨어지는 속도 (너무 빠르면 숫자를 낮추세요)
+        invader.top += 1.8; // 하강 속도
         invader.element.style.top = invader.top + 'px';
         
-        // 바닥에 닿으면 소멸
-        if (invader.top > 520) {
+        // 중요: 하단 입력창(경계선 부근인 440px)에 닿았을 때
+        if (invader.top > 440) {
             invader.element.remove();
             activeInvaders.splice(i, 1);
+            decreaseLife(); // 목숨 감소 함수 실행
         }
     }
 }
 
-// 엔터키 입력 시 정답 판정
+// 목숨 감소 및 게임 오버 판정 로직
+function decreaseLife() {
+    lives--;
+    // 하트 색 지우기 (뒤에서부터 lost 클래스 추가)
+    if (hearts[lives]) {
+        hearts[lives].classList.add('lost');
+    }
+    
+    if (lives <= 0) {
+        endGame();
+    }
+}
+
+function endGame() {
+    isGameOver = true;
+    clearInterval(spawnInterval);
+    clearInterval(loopInterval);
+    
+    // 화면에 남은 운석 전부 지우기
+    activeInvaders.forEach(invader => invader.element.remove());
+    activeInvaders = [];
+    
+    // 점수판 작동 및 결과 모달 띄우기
+    finalScoreDisplay.innerText = "최종 점수: " + score + "점";
+    gameOverScreen.classList.remove('hidden');
+    userInput.disabled = true; // 입력창 잠그기
+}
+
 userInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !isGameOver) {
         const inputText = userInput.value.trim();
-        
-        // 화면에 떠 있는 운석 중 매칭되는 기호 찾기 (대소문자 엄격히 구분)
         const targetIndex = activeInvaders.findIndex(invader => invader.code === inputText);
         
         if (targetIndex !== -1) {
-            // 이펙트 효과를 주며 격추
-            activeInvaders[targetIndex].element.style.backgroundColor = '#66fcf1';
-            activeInvaders[targetIndex].element.style.color = '#0b0c10';
+            // 파괴 성공 이펙트 (네온 컬러로 순간 번쩍인 뒤 삭제)
+            activeInvaders[targetIndex].element.style.background = '#00f2fe';
+            activeInvaders[targetIndex].element.style.color = '#060713';
+            activeInvaders[targetIndex].element.style.borderColor = '#00f2fe';
             
             setTimeout(() => {
                 if(activeInvaders[targetIndex]) {
                     activeInvaders[targetIndex].element.remove();
                     activeInvaders.splice(targetIndex, 1);
                 }
-            }, 100);
+            }, 150);
 
             score += 10;
             scoreDisplay.innerText = score;
         }
-        
         userInput.value = ''; 
     }
 });
 
-// 게임 시작 사이클 설정
-setInterval(createInvader, 2000); // 2초마다 행성 투하
-setInterval(gameLoop, 30);        // 프레임 드랍 방지 루프
+// 타이머 설정
+spawnInterval = setInterval(createInvader, 1800); // 1.8초마다 생성
+loopInterval = setInterval(gameLoop, 30);
