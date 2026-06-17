@@ -16,8 +16,11 @@ let playerName = "무명전사";
 let spawnInterval, loopInterval;
 
 let selectedDifficulty = "low"; 
-let gameSpeed = 1.5;            // 하 레벨 속도 1.5로 상향 조정!
-let spawnTime = 2000;           // 하 레벨 간격 2초로 쾌적하게 조정!
+let gameSpeed = 1.5;            
+let spawnTime = 2000;           
+
+// ★ 최근에 나온 원소를 기억해두는 배열 (연속 중복 방지용)
+let recentElements = [];
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -29,9 +32,6 @@ const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const finalScoreDisplay = document.getElementById('final-score');
 const rankingList = document.getElementById('ranking-list');
-
-const levelLowBtn = document.getElementById('level-low-btn');
-const levelHighBtn = document.getElementById('level-high-btn');
 
 let activeInvaders = [];
 
@@ -65,46 +65,70 @@ function playGameOverSound() {
     } catch(e){}
 }
 
-levelLowBtn.addEventListener('click', function() {
-    selectedDifficulty = "low";
-    levelLowBtn.style.background = "#00f2fe"; levelLowBtn.style.color = "#060713";
-    levelHighBtn.style.background = "transparent"; levelHighBtn.style.color = "#ff4b72";
-});
-levelHighBtn.addEventListener('click', function() {
-    selectedDifficulty = "high";
-    levelHighBtn.style.background = "#ff4b72"; levelHighBtn.style.color = "#060713";
-    levelLowBtn.style.background = "transparent"; levelLowBtn.style.color = "#00f2fe";
-});
+const startBtn = document.getElementById('start-btn');
+if (startBtn) {
+    startBtn.addEventListener('click', function() {
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
 
-document.getElementById('start-btn').addEventListener('click', function() {
-    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        const inputName = document.getElementById('player-name').value.trim();
+        if(inputName !== "") { playerName = inputName; }
+        
+        if (selectedDifficulty === "high") {
+            gameSpeed = 2.0;   
+            spawnTime = 1300;  
+            playerName += "(상)";
+        } else {
+            gameSpeed = 1.5;   
+            spawnTime = 2000;  
+            playerName += "(하)";
+        }
 
-    const inputName = document.getElementById('player-name').value.trim();
-    if(inputName !== "") { playerName = inputName; }
-    
-    // ★ 밸런스 정밀 튜닝 분기점
-    if (selectedDifficulty === "high") {
-        gameSpeed = 2.0;   // 기존의 스릴 넘치는 속도 그대로 (상)
-        spawnTime = 1300;  // 1.3초 간격
-        playerName += "(상)";
-    } else {
-        gameSpeed = 1.5;   // 너무 느리지 않고 딱 적당한 속도 (하)
-        spawnTime = 2000;  // 2초 간격으로 여유 부여
-        playerName += "(하)";
-    }
+        startScreen.classList.add('hidden');
+        userInput.disabled = false;
+        userInput.focus();
+        isGameStarted = true;
+        
+        spawnInterval = setInterval(createInvader, spawnTime); 
+        loopInterval = setInterval(gameLoop, 25);
+    });
+}
 
-    startScreen.classList.add('hidden');
-    userInput.disabled = false;
-    userInput.focus();
-    isGameStarted = true;
-    
-    spawnInterval = setInterval(createInvader, spawnTime); 
-    loopInterval = setInterval(gameLoop, 25);
-});
+const levelLowBtn = document.getElementById('level-low-btn');
+const levelHighBtn = document.getElementById('level-high-btn');
+
+if (levelLowBtn && levelHighBtn) {
+    levelLowBtn.addEventListener('click', function() {
+        selectedDifficulty = "low";
+        levelLowBtn.style.background = "#00f2fe"; levelLowBtn.style.color = "#060713";
+        levelHighBtn.style.background = "transparent"; levelHighBtn.style.color = "#ff4b72";
+    });
+    levelHighBtn.addEventListener('click', function() {
+        selectedDifficulty = "high";
+        levelHighBtn.style.background = "#ff4b72"; levelHighBtn.style.color = "#060713";
+        levelLowBtn.style.background = "transparent"; levelLowBtn.style.color = "#00f2fe";
+    });
+}
 
 function createInvader() {
     if (isGameOver || !isGameStarted) return;
-    const randomElement = elementDatabase[Math.floor(Math.random() * elementDatabase.length)];
+    
+    let randomElement;
+    let attempts = 0;
+    
+    // ★ 중복 차단 알고리즘: 최근에 뽑힌 3개 원소와 겹치지 않을 때까지 새로 뽑기 (최대 10번 시도)
+    while (attempts < 10) {
+        randomElement = elementDatabase[Math.floor(Math.random() * elementDatabase.length)];
+        if (!recentElements.includes(randomElement.name)) {
+            break;
+        }
+        attempts++;
+    }
+    
+    // 최근 목록 업데이트 (최대 3개까지 기억하고 오래된 건 삭제)
+    recentElements.push(randomElement.name);
+    if (recentElements.length > 3) {
+        recentElements.shift(); 
+    }
     
     const invaderElement = document.createElement('div');
     invaderElement.classList.add('invader');
@@ -195,14 +219,17 @@ function renderRankingList(rankings) {
     });
 }
 
-document.getElementById('reset-ranking-btn').addEventListener('click', function() {
-    const password = prompt("기록을 전체 삭제하려면 교사 비밀번호를 입력하세요.");
-    if (password === "과학123") {
-        localStorage.removeItem('schoolRankings');
-        alert("모든 학교 랭킹 기록이 초기화되었습니다.");
-        renderRankingList([]);
-    } else if (password !== null) { alert("비밀번호가 틀렸습니다."); }
-});
+const resetBtn = document.getElementById('reset-ranking-btn');
+if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+        const password = prompt("기록을 전체 삭제하려면 교사 비밀번호를 입력하세요.");
+        if (password === "과학123") {
+            localStorage.removeItem('schoolRankings');
+            alert("모든 학교 랭킹 기록이 초기화되었습니다.");
+            renderRankingList([]);
+        } else if (password !== null) { alert("비밀번호가 틀렸습니다."); }
+    });
+}
 
 userInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && !isGameOver && isGameStarted) {
