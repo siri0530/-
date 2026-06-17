@@ -8,6 +8,17 @@
 </head>
 <body>
     <div id="game-container">
+        <div id="start-screen" class="modal">
+            <div class="modal-content">
+                <h2>⚠️ 미션 공지 ⚠️</h2>
+                <p class="mission-text">우주 정거장으로 쏟아지는 원소 운석을 방어하라!<br><strong>[원소 이름]을 보고 올바른 [원소 기호]를 대소문자에 맞춰 입력하시오!</strong></p>
+                <div id="name-input-area">
+                    <input type="text" id="player-name" placeholder="닉네임 또는 학번 이름을 입력하세요" maxlength="10">
+                    <button id="start-btn">게임 시작</button>
+                </div>
+            </div>
+        </div>
+
         <div id="top-bar">
             <div id="score-board">점수: <span id="score">0</span></div>
             <div id="hearts-container">
@@ -20,14 +31,23 @@
         <div id="game-area"></div>
 
         <div id="input-area">
-            <input type="text" id="user-input" placeholder="원소 기호를 입력하고 Enter! (대소문자 구분)" autofocus>
+            <input type="text" id="user-input" placeholder="원소 기호를 입력하고 Enter!" disabled>
         </div>
 
-        <div id="game-over-screen" class="hidden">
-            <h2>GAME OVER</h2>
-            <p>우주 정거장이 파괴되었습니다!</p>
-            <div id="final-score">최종 점수: 0점</div>
-            <button id="restart-btn" onclick="location.reload()">다시 도전</button>
+        <div id="game-over-screen" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="alert-title">GAME OVER</h2>
+                <p>우주 정거장이 파괴되었습니다!</p>
+                <div id="final-score">최종 점수: 0점</div>
+                
+                <div id="ranking-box">
+                    <h3>🏆 명예의 전당 (우리 학교 랭킹)</h3>
+                    <ol id="ranking-list">
+                        </ol>
+                </div>
+
+                <button id="restart-btn" onclick="location.reload()">다시 도전하기</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
