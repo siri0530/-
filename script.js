@@ -37,7 +37,7 @@ document.getElementById('start-btn').addEventListener('click', function() {
     userInput.focus();
     isGameStarted = true;
     
-    spawnInterval = setInterval(createInvader, 1800); // 생성 주기도 1.8초로 쾌적하게 조절
+    spawnInterval = setInterval(createInvader, 1800); 
     loopInterval = setInterval(gameLoop, 25);
 });
 
@@ -67,10 +67,9 @@ function gameLoop() {
     
     for (let i = activeInvaders.length - 1; i >= 0; i--) {
         let invader = activeInvaders[i];
-        invader.top += 1.1; // ★ 속도를 2.0 -> 1.1로 훨씬 여유롭게 패치
+        invader.top += 1.1; 
         invader.element.style.top = invader.top + 'px';
         
-        // ★ 충돌 경계선 수정: 화면 맨 아래 바닥선(480px)에 완전히 닿았을 때 감지
         if (invader.top + 65 > 480) {
             invader.element.remove();
             activeInvaders.splice(i, 1);
@@ -101,13 +100,39 @@ function endGame() {
     finalScoreDisplay.innerText = "최종 점수: " + score + "점";
     
     let localRankings = JSON.parse(localStorage.getItem('schoolRankings')) || [];
-    localRankings.push({ name: playerName, score: score });
+    
+    // ★ [업데이트 로직] 이미 등록된 이름이 있는지 확인합니다.
+    const existingPlayerIndex = localRankings.findIndex(player => player.name === playerName);
+    
+    if (existingPlayerIndex !== -1) {
+        // 이름이 이미 있다면: 새 점수가 기존 점수보다 높을 때만 업데이트
+        if (score > localRankings[existingPlayerIndex].score) {
+            localRankings[existingPlayerIndex].score = score;
+        }
+    } else {
+        // 처음 치는 이름이라면 새로 추가
+        localRankings.push({ name: playerName, score: score });
+    }
+    
     localRankings.sort((a, b) => b.score - a.score);
     localRankings = localRankings.slice(0, 5);
     localStorage.setItem('schoolRankings', JSON.stringify(localRankings));
     
+    renderRankingList(localRankings);
+
+    gameOverScreen.classList.remove('hidden');
+    userInput.value = '';
+    userInput.disabled = true; 
+}
+
+// 랭킹 그리기 함수
+function renderRankingList(rankings) {
     rankingList.innerHTML = "";
-    localRankings.forEach((player, index) => {
+    if (rankings.length === 0) {
+        rankingList.innerHTML = "<li style='list-style:none; text-align:center; color:#888;'>등록된 기록이 없습니다.</li>";
+        return;
+    }
+    rankings.forEach((player, index) => {
         const li = document.createElement('li');
         if(player.name === playerName && player.score === score) {
             li.innerHTML = `<strong>${index + 1}등. ${player.name} - ${player.score}점 ★내기록</strong>`;
@@ -117,11 +142,20 @@ function endGame() {
         }
         rankingList.appendChild(li);
     });
-
-    gameOverScreen.classList.remove('hidden');
-    userInput.value = '';
-    userInput.disabled = true; 
 }
+
+// ★ [교사 전용 랭킹 초기화 버튼 기능]
+document.getElementById('reset-ranking-btn').addEventListener('click', function() {
+    const password = prompt("기록을 전체 삭제하려면 교사 비밀번호를 입력하세요.");
+    // 비밀번호는 '과학123' 으로 설정했습니다. 마음에 드는 걸로 변경 가능합니다!
+    if (password === "과학123") {
+        localStorage.removeItem('schoolRankings');
+        alert("모든 학교 랭킹 기록이 초기화되었습니다.");
+        renderRankingList([]);
+    } else if (password !== null) {
+        alert("비밀번호가 틀렸습니다.");
+    }
+});
 
 userInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && !isGameOver && isGameStarted) {
