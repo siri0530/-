@@ -1,5 +1,5 @@
 body {
-    background-color: #0b0c10;
+    background-color: #060713;
     color: #fff;
     font-family: 'Malgun Gothic', sans-serif;
     display: flex;
@@ -13,25 +13,47 @@ body {
 #game-container {
     width: 450px;
     height: 650px;
-    background: linear-gradient(180deg, #1f2833 0%, #0b0c10 100%);
-    border: 3px solid #66fcf1;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(102, 252, 241, 0.3);
+    background: radial-gradient(circle, #1a1b35 0%, #070816 100%);
+    border: 3px solid #00f2fe;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
+/* 상단 정보창 레이아웃 */
+#top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: rgba(26, 27, 53, 0.8);
+    border-bottom: 2px solid #00f2fe;
+    border-top-left-radius: 17px;
+    border-top-right-radius: 17px;
+}
+
 #score-board {
-    padding: 15px;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
-    color: #66fcf1;
-    background-color: #1f2833;
-    text-align: center;
-    border-bottom: 2px solid #45a29e;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    color: #00f2fe;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+}
+
+/* 분홍색 하트 목숨 스타일 */
+#hearts-container {
+    font-size: 24px;
+}
+.heart {
+    color: #ff7597; /* 예쁜 분홍색 */
+    margin-left: 5px;
+    text-shadow: 0 0 8px rgba(255, 117, 151, 0.6);
+    transition: all 0.3s ease;
+}
+.heart.lost {
+    color: #444455; /* 목숨을 잃으면 어두운 회색으로 지워짐 */
+    text-shadow: none;
 }
 
 #game-area {
@@ -40,41 +62,88 @@ body {
     overflow: hidden;
 }
 
-/* 떨어지는 원소 운석 스타일 */
+/* 진짜 울퉁불퉁한 운석 비주얼 */
 .invader {
     position: absolute;
-    background-color: #1f2833;
+    background: linear-gradient(135deg, #4b4d61 0%, #2c2d3d 100%);
     color: #fff;
-    padding: 10px 18px;
-    border: 2px solid #ff4d4d;
-    border-radius: 25px;
+    padding: 15px 20px;
+    border: 2px solid #ff4b72;
+    border-radius: 40% 50% 45% 55%; /* 운석처럼 울퉁불퉁한 원 모양 생성 */
     font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+    font-size: 16px;
+    box-shadow: 0 0 15px rgba(255, 75, 114, 0.4);
     white-space: nowrap;
-    transition: transform 0.1s linear;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: rotateMeteor 6s linear infinite; /* 스스로 빙글빙글 회전 */
+}
+
+@keyframes rotateMeteor {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 #input-area {
     padding: 20px;
-    background-color: #1f2833;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    background-color: #16172e;
+    border-bottom-left-radius: 17px;
+    border-bottom-right-radius: 17px;
 }
 
 #user-input {
     width: 90%;
     padding: 12px;
     font-size: 18px;
-    background-color: #0b0c10;
-    color: #66fcf1;
-    border: 2px solid #45a29e;
-    border-radius: 8px;
+    background-color: #090a15;
+    color: #00f2fe;
+    border: 2px solid #3d406b;
+    border-radius: 10px;
     text-align: center;
     outline: none;
 }
-
 #user-input:focus {
-    border-color: #66fcf1;
-    box-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+    border-color: #00f2fe;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
 }
+
+/* 게임 오버 팝업 스크린 */
+#game-over-screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(6, 7, 19, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 17px;
+    animation: fadeIn 0.5s ease;
+}
+#game-over-screen h2 {
+    color: #ff4b72;
+    font-size: 40px;
+    margin: 0 0 10px 0;
+    letter-spacing: 2px;
+}
+#final-score {
+    font-size: 24px;
+    color: #00f2fe;
+    margin: 20px 0;
+    font-weight: bold;
+}
+#restart-btn {
+    background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+    color: #060713;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+}
+.hidden { display: none !important; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
