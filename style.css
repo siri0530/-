@@ -13,7 +13,7 @@ body {
 #game-container {
     width: 450px;
     height: 650px;
-    background: radial-gradient(circle, #1a1b35 0%, #070816 100%);
+    background: radial-gradient(circle, #101126 0%, #050510 100%);
     border: 3px solid #00f2fe;
     border-radius: 20px;
     box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
@@ -22,13 +22,12 @@ body {
     flex-direction: column;
 }
 
-/* 상단 정보창 레이아웃 */
 #top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
-    background-color: rgba(26, 27, 53, 0.8);
+    background-color: rgba(22, 23, 46, 0.9);
     border-bottom: 2px solid #00f2fe;
     border-top-left-radius: 17px;
     border-top-right-radius: 17px;
@@ -41,19 +40,16 @@ body {
     text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
 }
 
-/* 분홍색 하트 목숨 스타일 */
-#hearts-container {
-    font-size: 24px;
-}
+#hearts-container { font-size: 24px; }
 .heart {
-    color: #ff7597; /* 예쁜 분홍색 */
+    color: #ff7597;
     margin-left: 5px;
-    text-shadow: 0 0 8px rgba(255, 117, 151, 0.6);
-    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255, 117, 151, 0.8);
+    transition: color 0.2s;
 }
 .heart.lost {
-    color: #444455; /* 목숨을 잃으면 어두운 회색으로 지워짐 */
-    text-shadow: none;
+    color: #2a2b3d !important;
+    text-shadow: none !important;
 }
 
 #game-area {
@@ -62,33 +58,28 @@ body {
     overflow: hidden;
 }
 
-/* 진짜 울퉁불퉁한 운석 비주얼 */
+/* 울퉁불퉁 진짜 회색 입체 운석 UI */
 .invader {
     position: absolute;
-    background: linear-gradient(135deg, #4b4d61 0%, #2c2d3d 100%);
-    color: #fff;
-    padding: 15px 20px;
-    border: 2px solid #ff4b72;
-    border-radius: 40% 50% 45% 55%; /* 운석처럼 울퉁불퉁한 원 모양 생성 */
+    background: radial-gradient(circle at 30% 30%, #5a5d7a 0%, #292a3a 100%);
+    color: #ffffff;
     font-weight: bold;
-    font-size: 16px;
-    box-shadow: 0 0 15px rgba(255, 75, 114, 0.4);
-    white-space: nowrap;
-    text-align: center;
+    font-size: 15px;
+    text-shadow: 1px 1px 2px #000;
+    width: 65px;
+    height: 65px;
+    border-radius: 55% 45% 52% 48% / 48% 52% 45% 55%;
+    border: 2px solid #3a3b4c;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.6), 0 4px 10px rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: rotateMeteor 6s linear infinite; /* 스스로 빙글빙글 회전 */
-}
-
-@keyframes rotateMeteor {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    white-space: nowrap;
 }
 
 #input-area {
     padding: 20px;
-    background-color: #16172e;
+    background-color: #121324;
     border-bottom-left-radius: 17px;
     border-bottom-right-radius: 17px;
 }
@@ -97,53 +88,80 @@ body {
     width: 90%;
     padding: 12px;
     font-size: 18px;
-    background-color: #090a15;
+    background-color: #05060f;
     color: #00f2fe;
     border: 2px solid #3d406b;
     border-radius: 10px;
     text-align: center;
     outline: none;
 }
-#user-input:focus {
-    border-color: #00f2fe;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
-}
 
-/* 게임 오버 팝업 스크린 */
-#game-over-screen {
+/* 공통 모달 팝업 구조 (시작 창 & 종료 창) */
+.modal {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(6, 7, 19, 0.95);
+    background-color: rgba(5, 6, 15, 0.95);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 100; /* 맨 위 레이어로 강제 고정 */
     border-radius: 17px;
-    animation: fadeIn 0.5s ease;
 }
-#game-over-screen h2 {
-    color: #ff4b72;
-    font-size: 40px;
-    margin: 0 0 10px 0;
-    letter-spacing: 2px;
+.modal-content {
+    width: 80%;
+    text-align: center;
+    animation: zoomIn 0.3s ease;
 }
-#final-score {
-    font-size: 24px;
-    color: #00f2fe;
-    margin: 20px 0;
-    font-weight: bold;
+.modal h2 { color: #00f2fe; font-size: 28px; margin-bottom: 15px; }
+.modal h2.alert-title { color: #ff4b72; font-size: 36px; }
+
+.mission-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #b0b3cc;
+    background: #16172e;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #00f2fe;
+    margin-bottom: 25px;
 }
-#restart-btn {
+
+#player-name {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #3d406b;
+    background: #090a15;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#start-btn, #restart-btn {
     background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-    color: #060713;
-    border: none;
-    padding: 12px 30px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 25px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+    color: #060713; border: none; padding: 12px 35px;
+    font-size: 16px; font-weight: bold; border-radius: 25px;
+    cursor: pointer; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
 }
+
+#final-score { font-size: 24px; color: #ff7597; font-weight: bold; margin: 15px 0; }
+
+/* 랭킹 보드 스타일 */
+#ranking-box {
+    background: #16172e;
+    border: 1px solid #3d406b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+#ranking-box h3 { font-size: 16px; margin: 0 0 10px 0; color: #00f2fe; }
+#ranking-list {
+    text-align: left; margin: 0; padding-left: 25px;
+    font-size: 15px; line-height: 1.8; color: #e0e2ff;
+}
+
 .hidden { display: none !important; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
