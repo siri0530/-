@@ -58,19 +58,24 @@ body {
     overflow: hidden;
 }
 
-/* 울퉁불퉁 진짜 회색 입체 운석 UI */
+/* ★ 글자 시인성 강화 대수술 ★ */
 .invader {
     position: absolute;
-    background: radial-gradient(circle at 30% 30%, #5a5d7a 0%, #292a3a 100%);
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 15px;
-    text-shadow: 1px 1px 2px #000;
+    background: radial-gradient(circle at 30% 30%, #4e5169 0%, #1e1f2b 100%);
+    
+    /* 글씨를 형광 노란색으로 변경하고 두껍게 처리 */
+    color: #fff000; 
+    font-weight: 900;
+    font-size: 18px;
+    
+    /* 검은색 외곽선을 강하게 주어 글자가 묻히지 않게 함 */
+    text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000, 1px 1px 5px #000;
+    
     width: 65px;
     height: 65px;
     border-radius: 55% 45% 52% 48% / 48% 52% 45% 55%;
-    border: 2px solid #3a3b4c;
-    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.6), 0 4px 10px rgba(0,0,0,0.5);
+    border: 2px solid #5a5d7a;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.7), 0 4px 10px rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -96,7 +101,6 @@ body {
     outline: none;
 }
 
-/* 공통 모달 팝업 구조 (시작 창 & 종료 창) */
 .modal {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -104,7 +108,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100; /* 맨 위 레이어로 강제 고정 */
+    z-index: 100;
     border-radius: 17px;
 }
 .modal-content {
@@ -147,7 +151,6 @@ body {
 
 #final-score { font-size: 24px; color: #ff7597; font-weight: bold; margin: 15px 0; }
 
-/* 랭킹 보드 스타일 */
 #ranking-box {
     background: #16172e;
     border: 1px solid #3d406b;
