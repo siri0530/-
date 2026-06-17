@@ -8,11 +8,26 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="score-board">점수: <span id="score">0</span></div>
-        <div id="game-area">
+        <div id="top-bar">
+            <div id="score-board">점수: <span id="score">0</span></div>
+            <div id="hearts-container">
+                <span class="heart">♥</span>
+                <span class="heart">♥</span>
+                <span class="heart">♥</span>
             </div>
+        </div>
+
+        <div id="game-area"></div>
+
         <div id="input-area">
             <input type="text" id="user-input" placeholder="원소 기호를 입력하고 Enter! (대소문자 구분)" autofocus>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <h2>GAME OVER</h2>
+            <p>우주 정거장이 파괴되었습니다!</p>
+            <div id="final-score">최종 점수: 0점</div>
+            <button id="restart-btn" onclick="location.reload()">다시 도전</button>
         </div>
     </div>
     <script src="script.js"></script>
